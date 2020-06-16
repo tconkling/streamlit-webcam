@@ -1,3 +1,7 @@
+# Project files
+localhost-key.pem
+localhost.pem
+
 # IDE files
 *.idea
 
