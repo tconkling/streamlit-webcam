@@ -1,6 +1,7 @@
 import os
-from typing import Dict, Any, Optional
+from typing import Optional
 
+from PIL import Image
 import streamlit as st
 
 _RELEASE = False
@@ -13,7 +14,7 @@ else:
     _component_func = st.declare_component("webcam", path=build_dir)
 
 
-def webcam(video=True, audio=True, key=None) -> Optional[Dict[str, Any]]:
+def webcam(video=True, audio=True, key=None) -> Optional[Image]:
     """Create a new instance of "webcam".
 
     Parameters
@@ -29,13 +30,17 @@ def webcam(video=True, audio=True, key=None) -> Optional[Dict[str, Any]]:
 
     Returns
     -------
-    dict or None
+    Image or None
+        The most recent captured image from the webcam.
 
     """
-    component_value = _component_func(
+    value = _component_func(
         video=video,
         audio=audio,
         key=key,
         default=None,
     )
-    return component_value
+    width = value["width"]
+    height = value["height"]
+    data = value["data"]
+    return Image.frombytes("RGBA", (width, height), bytes(data))
