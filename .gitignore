@@ -1,0 +1,9 @@
+# IDE files
+*.idea
+
+# Python stuff
+__pycache__
+venv/
+
+# Frontend stuff
+node_modules/
