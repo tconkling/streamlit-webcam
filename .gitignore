@@ -6,4 +6,5 @@ __pycache__
 venv/
 
 # Frontend stuff
+yarn.lock
 node_modules/
