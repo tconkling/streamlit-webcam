@@ -25,9 +25,33 @@ class Webcam extends StreamlitComponentBase<State> {
   public componentDidMount() {
 		super.componentDidMount()
 
-		// Request a media stream that fulfills our constraints.
+		// We won't have access to mediaDevices when running in http (except
+		// maybe on localhost?).
+		if (navigator.mediaDevices == null) {
+			this.setState({ mediaStreamErr: "Can't access MediaDevices. Are you running in https?"})
+			return
+		}
+
 		const audio = this.props.args["audio"] as boolean
 		const video = this.props.args["video"] as boolean
+
+		// If this browser supports querying the 'featurePolicy', check if we support
+		// the requested features.
+		const featurePolicy = (document as any)["featurePolicy"]
+		if (featurePolicy != null) {
+			console.log(`featurePolicy: ${featurePolicy.allowedFeatures()}`)
+			if (video && !featurePolicy.allowsFeature("video")) {
+				this.setState({ mediaStreamErr: "'video' is not in our featurePolicy" })
+				return
+			}
+
+			if (audio && !featurePolicy.allowsFeature("microphone")) {
+				this.setState({ mediaStreamErr: "'microphone' is not in our featurePolicy" })
+				return
+			}
+		}
+
+		// Request a media stream that fulfills our constraints.
 		const constraints: MediaStreamConstraints = { audio, video }
 		navigator.mediaDevices.getUserMedia(constraints)
 			.then(mediaStream => this.setState({ mediaStream: mediaStream }))
