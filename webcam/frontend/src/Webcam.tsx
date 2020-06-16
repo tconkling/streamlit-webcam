@@ -9,7 +9,7 @@ import "bootstrap/dist/css/bootstrap.min.css"
 import "./streamlit.css"
 
 interface State {
-	mediaStream?: any
+	mediaStream?: MediaStream
 	mediaStreamErr?: any
 }
 
@@ -35,20 +35,18 @@ class Webcam extends StreamlitComponentBase<State> {
 		const audio = this.props.args["audio"] as boolean
 		const video = this.props.args["video"] as boolean
 
-		// If this browser supports querying the 'featurePolicy', check if we support
-		// the requested features.
-		const featurePolicy = (document as any)["featurePolicy"]
-		if (featurePolicy != null) {
-			console.log(`featurePolicy: ${featurePolicy.allowedFeatures()}`)
-			if (video && !featurePolicy.allowsFeature("video")) {
-				this.setState({ mediaStreamErr: "'video' is not in our featurePolicy" })
-				return
+		// If this browser supports querying the 'featurePolicy', check that
+		// we support the requested features.
+		try {
+			if (video) {
+				this.requireFeature("camera")
 			}
-
-			if (audio && !featurePolicy.allowsFeature("microphone")) {
-				this.setState({ mediaStreamErr: "'microphone' is not in our featurePolicy" })
-				return
+			if (audio) {
+				this.requireFeature("microphone")
 			}
+		} catch (err) {
+			this.setState({ mediaStreamErr: err })
+			return
 		}
 
 		// Request a media stream that fulfills our constraints.
@@ -56,6 +54,23 @@ class Webcam extends StreamlitComponentBase<State> {
 		navigator.mediaDevices.getUserMedia(constraints)
 			.then(mediaStream => this.setState({ mediaStream: mediaStream }))
 			.catch(err => this.setState({ mediaStreamErr: err }))
+	}
+
+	/**
+	 * Throw an error if the feature with the given name is not in our document's
+	 * featurePolicy.
+	 */
+	private requireFeature = (name: string): void => {
+		// We may not be able to access `featurePolicy` - Safari doesn't support
+		// accessing it, for example. In this case, the function is a no-op.
+		const featurePolicy = (document as any)["featurePolicy"]
+		if (featurePolicy == null) {
+			return
+		}
+
+		if (!featurePolicy.allowsFeature(name)) {
+			throw new Error(`'${name}' is not in our featurePolicy`)
+		}
 	}
 
 	private get webcamRequestState(): WebcamRequestState {
@@ -67,16 +82,20 @@ class Webcam extends StreamlitComponentBase<State> {
   	return WebcamRequestState.PENDING
 	}
 
+	/** Assign our mediaStream to a Video element. */
+	private assignMediaStream = (video: HTMLVideoElement): void => {
+		if (video != null && this.state.mediaStream != null) {
+			video.srcObject = this.state.mediaStream
+			video.play().catch(err => console.warn(`'video.play' error: ${err.toString()}`))
+		}
+	}
+
 	public render = (): ReactNode => {
   	const requestState = this.webcamRequestState
 		Streamlit.setComponentValue(requestState === WebcamRequestState.SUCCESS)
 
 		if (requestState === WebcamRequestState.SUCCESS) {
-			return (
-				<div>
-					<video src={this.state.mediaStream}/>
-				</div>
-			)
+			return <video ref={this.assignMediaStream} height={500}/>
 		}
 
 		if (requestState === WebcamRequestState.FAILURE) {
