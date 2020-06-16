@@ -1,4 +1,5 @@
 import streamlit as st
+from PIL import Image
 from webcam import webcam
 
 st.title("Webcam capture component")
@@ -9,5 +10,13 @@ st.write("""
 return it to Streamlit.
 """)
 image = webcam(video=True, audio=False)
-if image is not None:
-    st.write("width: ", image["width"], "height: ", image["height"])
+if image is None:
+    st.write("Waiting for capture...")
+else:
+    st.write("Got an image from the webcam:")
+    width = image["width"]
+    height = image["height"]
+    data = image["data"]
+    image = Image.frombytes("RGBA", (width, height), bytes(data))
+    st.image(image)
+

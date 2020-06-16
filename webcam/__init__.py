@@ -1,4 +1,6 @@
 import os
+from typing import Dict, Any, Optional
+
 import streamlit as st
 
 _RELEASE = False
@@ -11,7 +13,7 @@ else:
     _component_func = st.declare_component("webcam", path=build_dir)
 
 
-def webcam(video=True, audio=True, key=None):
+def webcam(video=True, audio=True, key=None) -> Optional[Dict[str, Any]]:
     """Create a new instance of "webcam".
 
     Parameters
@@ -27,8 +29,7 @@ def webcam(video=True, audio=True, key=None):
 
     Returns
     -------
-    bool
-        True if we got a webcam.
+    dict or None
 
     """
     component_value = _component_func(
