@@ -8,9 +8,14 @@ import {
 import "bootstrap/dist/css/bootstrap.min.css"
 import "./streamlit.css"
 
+// ImageCapture polyfill for Safari
+import "image-capture"
+
 interface State {
 	mediaStream?: MediaStream
 	mediaStreamErr?: any
+	imageCapture?: ImageCapture
+	imageBitmap?: ImageBitmap
 }
 
 enum WebcamRequestState {
@@ -52,8 +57,19 @@ class Webcam extends StreamlitComponentBase<State> {
 		// Request a media stream that fulfills our constraints.
 		const constraints: MediaStreamConstraints = { audio, video }
 		navigator.mediaDevices.getUserMedia(constraints)
-			.then(mediaStream => this.setState({ mediaStream: mediaStream }))
+			.then(this.onGotMediaStream)
 			.catch(err => this.setState({ mediaStreamErr: err }))
+	}
+
+	private onGotMediaStream = (mediaStream: MediaStream): void => {
+  	// Extract the video track.
+		let imageCapture = null
+		if (mediaStream.getVideoTracks().length > 0) {
+			const videoDevice = mediaStream.getVideoTracks()[0]
+			const imgCaptureClass = (window as any)["ImageCapture"]
+			imageCapture = new imgCaptureClass(videoDevice)
+		}
+  	this.setState({ mediaStream, imageCapture })
 	}
 
 	/**
@@ -92,10 +108,15 @@ class Webcam extends StreamlitComponentBase<State> {
 
 	public render = (): ReactNode => {
   	const requestState = this.webcamRequestState
-		Streamlit.setComponentValue(requestState === WebcamRequestState.SUCCESS)
-
 		if (requestState === WebcamRequestState.SUCCESS) {
-			return <video ref={this.assignMediaStream} height={500}/>
+			return (
+				<div>
+					<button onClick={this.captureFrame} disabled={this.props.disabled || this.state.imageCapture == null}>
+						Capture Frame
+					</button>
+					<video ref={this.assignMediaStream} height={500}/>
+				</div>
+			)
 		}
 
 		if (requestState === WebcamRequestState.FAILURE) {
@@ -104,6 +125,53 @@ class Webcam extends StreamlitComponentBase<State> {
 
 		return <div>Requesting webcam...</div>
   }
+
+  private captureFrame = (): void => {
+		if (this.state.imageCapture == null) {
+			console.warn("Can't captureFrame: no imageCapture object!")
+			return
+		}
+
+		this.state.imageCapture.grabFrame()
+			.then(this.renderBitmap)
+			.then(imageData => {
+				const data = {
+					width: imageData.width,
+					height: imageData.height,
+					data: Array.from(imageData.data),
+				}
+				Streamlit.setComponentValue(data)
+			})
+			.catch(err => {
+				console.error(`CaptureFrame error: ${err.toString()}`)
+			})
+	}
+
+	private renderBitmap = (imageBitmap: ImageBitmap): ImageData => {
+		const canvas = document.body.appendChild(document.createElement("canvas"))
+		try {
+			return getImageData(canvas, imageBitmap)
+		} catch (err) {
+			throw err
+		} finally {
+			document.body.removeChild(canvas)
+		}
+	}
+}
+
+/** Render an ImageBitmap to a canvas to retrieve its ImageData. */
+function getImageData(canvas: HTMLCanvasElement, bitmap: ImageBitmap): ImageData {
+	canvas.width = bitmap.width
+	canvas.height = bitmap.height
+
+	let context = canvas.getContext("2d")
+	if (context == null) {
+		throw new Error("Couldn't get 2D context from <canvas>")
+	}
+
+	context.clearRect(0, 0, canvas.width, canvas.height);
+	context.drawImage(bitmap, 0, 0)
+	return context.getImageData(0, 0, canvas.width, canvas.height)
 }
 
 export default withStreamlitConnection(Webcam)

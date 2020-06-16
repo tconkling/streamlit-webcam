@@ -35,6 +35,6 @@ def webcam(video=True, audio=True, key=None):
         video=video,
         audio=audio,
         key=key,
-        default=False,
+        default=None,
     )
     return component_value
