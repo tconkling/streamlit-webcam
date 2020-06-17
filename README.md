@@ -2,7 +2,7 @@
 
 ## Usage
 
-```
+```python
 import streamlit as st
 from webcam import webcam
 
