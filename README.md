@@ -1,5 +1,19 @@
 # A webcam component for Streamlit
 
+## Usage
+
+```
+import streamlit as st
+from webcam import webcam
+
+image = webcam(video=True, audio=False)
+if image is None:
+    st.write("Waiting for capture...")
+else:
+    st.write("Got an image from the webcam:")
+    st.image(image)
+```
+
 ## Getting `https://localhost` to work with Streamlit
 
 (Webcam access requires `https`, which makes localhost testing a pain.)
