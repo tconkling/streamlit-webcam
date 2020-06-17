@@ -17,6 +17,7 @@ else:
 ## Getting `https://localhost` to work with Streamlit
 
 (Webcam access requires `https`, which makes localhost testing a pain.)
+
 (Actually, within Chrome this is not true! Chrome allows webcam access from http://localhost)
 
 Use [mkcert](https://github.com/FiloSottile/mkcert) to create certs:
