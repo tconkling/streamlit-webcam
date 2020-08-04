@@ -1,10 +1,10 @@
 import setuptools
 
 setuptools.setup(
-    name="streamlit-custom-component",
+    name="streamlit-webcam-component",
     version="0.0.1",
-    author="",
-    author_email="",
+    author="Tim Conkling",
+    author_email="tim@streamlit.io",
     description="",
     long_description="",
     long_description_content_type="text/plain",
@@ -12,5 +12,8 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     include_package_data=True,
     classifiers=[],
-    python_requires=">=3.6",
+    python_requires=">=3.7",
+    install_requires=[
+        "streamlit >= 0.73",
+    ],
 )

@@ -1,2 +1,0 @@
-./streamlit-0.61.0-py2.py3-none-any.whl
-Pillow
