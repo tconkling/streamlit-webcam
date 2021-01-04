@@ -9,10 +9,10 @@ st.write("""
 - Click the "Capture Frame" button to grab the current video frame and
 return it to Streamlit.
 """)
-image = webcam(video=True, audio=False)
-if image is None:
+captured_image = webcam()
+if captured_image is None:
     st.write("Waiting for capture...")
 else:
     st.write("Got an image from the webcam:")
-    st.image(image)
+    st.image(captured_image)
 

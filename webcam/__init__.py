@@ -14,15 +14,14 @@ else:
     _component_func = components.declare_component("webcam", path=build_dir)
 
 
-def webcam(video=True, audio=True, key=None) -> Optional[PIL.Image.Image]:
-    """Create a new instance of "webcam".
+def webcam(key=None) -> Optional[PIL.Image.Image]:
+    """Show a webcam component with a "Capture Frame" button.
+
+    When the user clicks Capture Frame, a webcam snapshot is captured and
+    returned to the Streamlit script.
 
     Parameters
     ----------
-    video: bool
-        If True, we request a video stream.
-    audio: bool
-        If True, we request an audio stream.
     key: str or None
         An optional key that uniquely identifies this component. If this is
         None, and the component's arguments are changed, the component will
@@ -34,12 +33,7 @@ def webcam(video=True, audio=True, key=None) -> Optional[PIL.Image.Image]:
         The most recent captured image from the webcam.
 
     """
-    value = _component_func(
-        video=video,
-        audio=audio,
-        key=key,
-        default=None,
-    )
+    value = _component_func(key=key, default=None)
 
     if value is None:
         return None
