@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="streamlit-webcam-example",
-    version="0.0.1",
+    version="0.1.0",
     author="Tim Conkling",
     author_email="tim@streamlit.io",
     description="",
