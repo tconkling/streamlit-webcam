@@ -1,9 +1,8 @@
 # Project files
-localhost-key.pem
-localhost.pem
+build/
 
 # IDE files
-*.idea
+.idea/
 
 # Python stuff
 __pycache__

@@ -1,7 +1,15 @@
-# streamlit-webcam 
+# streamlit-webcam-example
 
-An example Streamlit Component. Displays a webcam video feed and receives
+An example [Streamlit Component](https://www.streamlit.io/components). Displays a webcam video feed and receives
 webcam snapshots.
+
+Feel free to fork and modify!
+
+## Installation
+
+```shell
+pip install streamlit-webcam-example
+```
 
 ## Usage
 
