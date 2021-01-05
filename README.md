@@ -1,4 +1,7 @@
-# A example webcam component for Streamlit
+# streamlit-webcam 
+
+An example Streamlit Component. Displays a webcam video feed and receives
+webcam snapshots.
 
 ## Usage
 
@@ -13,3 +16,5 @@ else:
     st.write("Got an image from the webcam:")
     st.image(captured_image)
 ```
+
+![Screenshot](screenshot.jpeg)
