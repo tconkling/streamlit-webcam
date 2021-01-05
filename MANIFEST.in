@@ -1,1 +1,1 @@
-include webcam/frontend/build/*
+recursive-include webcam/frontend/build *
